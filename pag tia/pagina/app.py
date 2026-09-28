@@ -8,19 +8,19 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'clave_secreta_muy_segura_para_produccion')
 
-# URL de conexión a Neon
-DATABASE_URL = os.environ.get('DATABASE_URL', "postgresql://tu_usuario:tu_password@ep-aged-darkness-xxxx.us-east-2.aws.neon.tech/neondb?sslmode=require")
+# URL de conexión a Neon PostgreSQL desde variables de entorno
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 # ==========================================
 # FUNCIONES AUXILIARES DE BASE DE DATOS
 # ==========================================
 def get_db():
-    """Crea una conexión con la base de datos Neon y devuelve un cursor de tipo diccionario."""
+    """Crea una conexión con la base de datos Neon en PostgreSQL."""
     conn = psycopg2.connect(DATABASE_URL)
     return conn
 
 def init_db():
-    """Inicializa la estructura de las tablas en PostgreSQL e inserta datos iniciales si no existen."""
+    """Inicializa la estructura de las tablas en Neon e inserta datos iniciales si la BD está vacía."""
     conn = get_db()
     c = conn.cursor()
     
@@ -50,7 +50,7 @@ def init_db():
         );
     ''')
     
-    # Verificar si la tabla edificios está vacía
+    # Verificar si la tabla edificios está vacía para poblar datos por primera vez
     c.execute('SELECT COUNT(*) FROM edificios;')
     if c.fetchone()[0] == 0:
         edificios = [
@@ -79,7 +79,7 @@ def index():
     conn.close()
     return render_template('index.html', edificios=edificios)
 
-@app.route('/acceso/', methods=['POST'])
+@app.route('/acceso/<int:edificio_id>', methods=['POST'])
 def acceso_edificio(edificio_id):
     password = request.form['password']
     conn = get_db()
@@ -96,7 +96,7 @@ def acceso_edificio(edificio_id):
         flash('Contraseña incorrecta, intenta de nuevo.', 'error')
         return redirect(url_for('index'))
 
-@app.route('/visor/')
+@app.route('/visor/<int:edificio_id>')
 def visor_pdf(edificio_id):
     es_admin = session.get('admin_logged_in', False)
     tiene_acceso = session.get(f'acceso_{edificio_id}', False)
@@ -118,7 +118,7 @@ def visor_pdf(edificio_id):
     
     return render_template('visor.html', edificio=edificio, es_admin=es_admin, pdf_existe=bool(pdf_existe))
 
-@app.route('/ver_archivo/')
+@app.route('/ver_archivo/<int:edificio_id>')
 def ver_archivo(edificio_id):
     if not (session.get('admin_logged_in') or session.get(f'acceso_{edificio_id}')):
         return "Acceso denegado", 403
@@ -135,7 +135,7 @@ def ver_archivo(edificio_id):
         return send_file(io.BytesIO(pdf_data), mimetype='application/pdf')
     return "No encontrado", 404
 
-@app.route('/subir_pdf/', methods=['POST'])
+@app.route('/subir_pdf/<int:edificio_id>', methods=['POST'])
 def subir_pdf(edificio_id):
     if not session.get('admin_logged_in'):
         return redirect(url_for('index'))
@@ -157,13 +157,13 @@ def subir_pdf(edificio_id):
         conn.commit()
         c.close()
         conn.close()
-        flash('Estado de cuenta subido y actualizado exitosamente.', 'success')
+        flash('Estado de cuenta subido y actualizado exitosamente en Neon.', 'success')
     else:
         flash('Por favor, selecciona un archivo PDF válido.', 'error')
         
     return redirect(url_for('visor_pdf', edificio_id=edificio_id))
 
-@app.route('/eliminar_pdf/', methods=['POST'])
+@app.route('/eliminar_pdf/<int:edificio_id>', methods=['POST'])
 def eliminar_pdf(edificio_id):
     if not session.get('admin_logged_in'):
         return redirect(url_for('index'))
@@ -175,7 +175,7 @@ def eliminar_pdf(edificio_id):
     c.close()
     conn.close()
     
-    flash('Estado de cuenta eliminado correctamente.', 'success')
+    flash('Estado de cuenta eliminado correctamente de Neon.', 'success')
     return redirect(url_for('visor_pdf', edificio_id=edificio_id))
 
 @app.route('/admin', methods=['GET', 'POST'])

@@ -4,6 +4,7 @@
     <h2 class="text-3xl font-bold">Portal de Residentes</h2>
     <p class="mt-2 text-gray-500">Selecciona tu edificio e ingresa la contraseña para ver tu estado de cuenta mensual.</p>
 </div>
+
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     {% for b in edificios %}
     {% set imagen = '' %}
@@ -17,10 +18,15 @@
         {% set imagen = 'Miguel_Laurent_28.png' %}
     {% endif %}
     
-    {{ b.nombre }}
-    {% if imagen %}
-        <img src="{{ url_for('static', filename=img/ + imagen) }}" alt="{{ b.nombre }}" class="w-full h-32 object-cover">
-    {% endif %}
+    <div class="border rounded-lg shadow-sm overflow-hidden bg-white">
+        <div class="font-bold text-lg p-3 text-center border-b bg-gray-50">
+            {{ b.nombre }}
+        </div>
+        
+        {% if imagen %}
+            <img src="{{ url_for('static', filename='img/' + imagen) }}" alt="{{ b.nombre }}" class="w-full h-32 object-cover">
+        {% endif %}
+        
         <div class="p-5">
             <form action="{{ url_for('acceso_edificio', edificio_id=b.id) }}" method="POST">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña:</label>
