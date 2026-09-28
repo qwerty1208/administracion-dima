@@ -15,6 +15,7 @@
         {% set imagen = 'cerezas.png' %}
     {% elif 'Miguel' in b.nombre or 'Laurent' in b.nombre %}
         {% set imagen = 'Miguel_Laurent_28.png' %}
+    {% endif %}
     
     {{ b.nombre }}
     {% if imagen %}
