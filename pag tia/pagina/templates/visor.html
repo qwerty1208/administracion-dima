@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-gray-200 pb-4 gap-4">
+    <div>
+        <h2 class="text-3xl font-black text-gray-900">{{ edificio.nombre }}</h2>
+        <p class="text-gray-500 mt-1 font-medium">Visualizando Estado de Cuenta Mensual</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="inline-flex items-center text-indigo-600 font-bold hover:text-indigo-800 transition bg-indigo-50 px-4 py-2 rounded-lg">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Volver al inicio
+    </a>
+</div>
+
+<!-- Panel exclusivo para el Administrador (Subir y Eliminar) -->
+{% if es_admin %}
+<div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-xl shadow-sm border border-indigo-100 mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
+    <div class="w-full">
+        <div class="flex items-center gap-2 mb-2">
+            <svg class="w-6 h-6 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <h4 class="font-bold text-indigo-900 text-lg">Panel de Control de Administrador</h4>
+        </div>
+        <p class="text-sm text-indigo-700 mb-4">Sube un nuevo archivo PDF para reemplazar el actual o elimina el documento existente.</p>
+        
+        <!-- Formulario para Subir -->
+        <form action="{{ url_for('subir_pdf', edificio_id=edificio.id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3 items-center bg-white p-2 rounded-lg border border-indigo-100">
+            <input type="file" name="documento_pdf" accept=".pdf, application/pdf" required 
+                class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 bg-transparent cursor-pointer">
+            <button type="submit" class="w-full sm:w-auto bg-green-600 text-white font-bold px-6 py-2 rounded-md hover:bg-green-700 transition whitespace-nowrap shadow-sm text-sm">
+                Subir / Reemplazar
+            </button>
+        </form>
+    </div>
+
+    <!-- Botón para Eliminar PDF (Solo aparece si el admin está logueado) -->
+    {% if pdf_existe %}
+    <div class="w-full sm:w-auto flex flex-col justify-center border-t sm:border-t-0 sm:border-l border-indigo-200 pt-4 sm:pt-0 sm:pl-6">
+        <form action="{{ url_for('eliminar_pdf', edificio_id=edificio.id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar el estado de cuenta de este edificio?');">
+            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-md transition shadow-sm text-sm whitespace-nowrap flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                Eliminar PDF
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Contenedor del Visor PDF -->
+<div class="bg-white rounded-2xl shadow-xl border border-gray-300 w-full overflow-hidden" style="height: 75vh; min-height: 500px;">
+    {% if pdf_existe %}
+        <iframe src="{{ url_for('ver_archivo', edificio_id=edificio.id) }}#toolbar=0&view=FitH" width="100%" height="100%" class="border-none bg-gray-100">
+            Tu navegador no soporta iframes para PDF.
+        </iframe>
+    {% else %}
+        <div class="flex flex-col items-center justify-center h-full text-gray-500 bg-gray-50 p-6 text-center">
+            <svg class="w-24 h-24 mb-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <h3 class="text-2xl font-bold text-gray-700">Documento no disponible</h3>
+            <p class="mt-3 text-lg max-w-md mx-auto">La administración aún no ha publicado el estado de cuenta de este mes para <strong>{{ edificio.nombre }}</strong>.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

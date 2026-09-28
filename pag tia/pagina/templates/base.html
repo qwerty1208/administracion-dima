@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración DIMA</title>
+    <!-- Incluimos TailwindCSS para el diseño rápido y bonito -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen text-gray-800 font-sans">
+    
+    <!-- Barra de navegación (Header) -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="{{ url_for('index') }}" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-green-500">
+                ADMINISTRACIÓN DIMA
+            </a>
+            
+            <nav class="flex items-center gap-4">
+                {% if session.get('admin_logged_in') %}
+                    <span class="text-indigo-600 font-medium px-3 py-2 bg-indigo-50 rounded-md">Modo Admin Activo</span>
+                    <a href="{{ url_for('logout') }}" class="text-red-500 hover:text-red-700 font-medium px-3 py-2 transition">Cerrar Sesión</a>
+                {% else %}
+                    <a href="{{ url_for('admin_login') }}" class="bg-gray-900 text-white font-medium px-4 py-2 rounded-md hover:bg-gray-800 transition">Acceso Admin</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-10">
+        <!-- Sistema de Notificaciones (Flash Messages) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-4 mb-6 rounded-md border 
+                        {% if category == 'error' %} bg-red-50 text-red-700 border-red-200 
+                        {% else %} bg-blue-50 text-blue-700 border-blue-200 {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Aquí se inyectarán las otras páginas -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+            &copy; 2026 Administración DIMA. Todos los derechos reservados.
+        </div>
+    </footer>
+</body>
+</html>
