@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'clave_secreta_muy_segura_para_produccion')
 
-# URL de conexión a Neon (Cópiala de tu panel de Neon)
+# URL de conexión a Neon
 DATABASE_URL = os.environ.get('DATABASE_URL', "postgresql://tu_usuario:tu_password@ep-aged-darkness-xxxx.us-east-2.aws.neon.tech/neondb?sslmode=require")
 
 # ==========================================
@@ -24,7 +24,7 @@ def init_db():
     conn = get_db()
     c = conn.cursor()
     
-    # Crear tablas en PostgreSQL (BYTEA en lugar de BLOB, SERIAL en lugar of INTEGER PRIMARY KEY AUTOINCREMENT)
+    # Crear tablas en PostgreSQL
     c.execute('''
         CREATE TABLE IF NOT EXISTS edificios (
             id SERIAL PRIMARY KEY, 
@@ -131,7 +131,6 @@ def ver_archivo(edificio_id):
     conn.close()
     
     if documento and documento['archivo_pdf']:
-        # Convertimos los datos binarios de PostgreSQL (BYTEA / memoryview) a bytes de Python
         pdf_data = bytes(documento['archivo_pdf'])
         return send_file(io.BytesIO(pdf_data), mimetype='application/pdf')
     return "No encontrado", 404
@@ -206,6 +205,8 @@ def logout():
     session.clear()
     flash('Sesión cerrada correctamente.', 'success')
     return redirect(url_for('index'))
+
+# Inicialización obligatoria para producción en Render
 with app.app_context():
     init_db()
 
