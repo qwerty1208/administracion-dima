@@ -19,7 +19,7 @@
     
     {{ b.nombre }}
     {% if imagen %}
-        <img src="{{ url_for('static', filename=/img) }}" alt="{{ b.nombre }}" class="w-full h-32 object-cover">
+        <img src="{{ url_for('static', filename=img/ + imagen) }}" alt="{{ b.nombre }}" class="w-full h-32 object-cover">
     {% endif %}
         <div class="p-5">
             <form action="{{ url_for('acceso_edificio', edificio_id=b.id) }}" method="POST">
