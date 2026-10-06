@@ -13,11 +13,11 @@
     {% set imagen = 'Miguel_Laurent_28.png' %}
 {% endif %}
 
-<!-- Header principal: Logo/Imagen a la izquierda + Botón Volver -->
+<!-- Header principal: Logo a la izquierda + Leyenda (sin el texto del nombre duplicado) + Botón Volver -->
 <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-700 pb-4 gap-4">
     <div class="flex items-center gap-4">
         {% if imagen %}
-        <!-- Imagen del edificio alineada a la izquierda en fondo blanco limpio -->
+        <!-- Imagen/Logo del edificio a la izquierda -->
         <div class="bg-white p-2 rounded-xl border border-gray-700 h-20 w-44 flex items-center justify-center shrink-0 shadow-sm">
             <img src="{{ url_for('static', filename='img/' + imagen) }}" alt="{{ edificio.nombre }}" class="max-h-full max-w-full object-contain">
         </div>
