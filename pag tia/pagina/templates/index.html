@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="text-center mb-10">
-    <h2 class="text-3xl font-bold">Portal de Residentes</h2>
-    <p class="mt-2 text-gray-500">Selecciona tu edificio e ingresa la contraseña para ver tu estado de cuenta mensual.</p>
+    <h2 class="text-3xl font-bold text-white">Portal de Residentes</h2>
+    <p class="mt-2 text-gray-400">Selecciona tu edificio e ingresa la contraseña para ver tu estado de cuenta mensual.</p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -18,20 +18,26 @@
         {% set imagen = 'Miguel_Laurent_28.png' %}
     {% endif %}
     
-    <div class="border rounded-lg shadow-sm overflow-hidden bg-white">
-        <div class="font-bold text-lg p-3 text-center border-b bg-gray-50">
+    <div class="border border-gray-700 rounded-xl shadow-lg overflow-hidden bg-gray-800 flex flex-col justify-between">
+        
+        <!-- Nombre del Edificio -->
+        <div class="font-bold text-lg p-3 text-center border-b border-gray-700 bg-gray-900 text-white">
             {{ b.nombre }}
         </div>
         
-        {% if imagen %}
-            <img src="{{ url_for('static', filename='img/' + imagen) }}" alt="{{ b.nombre }}" class="w-full h-32 object-cover">
-        {% endif %}
+        <!-- Contenedor de la Imagen sin recortes -->
+        <div class="p-4 bg-white flex items-center justify-center h-44">
+            {% if imagen %}
+                <img src="{{ url_for('static', filename='img/' + imagen) }}" alt="{{ b.nombre }}" class="max-h-full max-w-full object-contain">
+            {% endif %}
+        </div>
         
-        <div class="p-5">
+        <!-- Formulario -->
+        <div class="p-5 bg-gray-800">
             <form action="{{ url_for('acceso_edificio', edificio_id=b.id) }}" method="POST">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña:</label>
-                <input type="password" name="password" required class="w-full border-gray-300 rounded-md shadow-sm border p-2 mb-3">
-                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700">Ingresar</button>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Contraseña:</label>
+                <input type="password" name="password" required class="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2 mb-3 outline-none focus:border-indigo-500">
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-md hover:bg-indigo-700 transition">Ingresar</button>
             </form>
         </div>
     </div>
