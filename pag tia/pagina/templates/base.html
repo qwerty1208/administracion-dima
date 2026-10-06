@@ -52,5 +52,55 @@
             &copy; 2026 Administración DIMA. Todos los derechos reservados.
         </div>
     </footer>
+    <script>
+    // 1. Desactivar menú de clic derecho
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+
+    // 2. Bloquear combinaciones de teclado de inspección
+    document.addEventListener('keydown', function(e) {
+        // Bloquear F12
+        if (e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        // Bloquear Ctrl+Shift+I (Inspeccionar)
+        if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+            e.preventDefault();
+            return false;
+        }
+        // Bloquear Ctrl+Shift+J (Consola)
+        if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+            e.preventDefault();
+            return false;
+        }
+        // Bloquear Ctrl+U (Ver código fuente)
+        if (e.ctrlKey && e.keyCode === 85) {
+            e.preventDefault();
+            return false;
+        }
+        // Bloquear Ctrl+S (Guardar página)
+        if (e.ctrlKey && e.keyCode === 83) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // 3. Trampa contra DevTools abierto (congela el navegador si abren F12)
+    (function() {
+        function blockDevTools() {
+            const start = performance.now();
+            debugger; // Si la consola está abierta, el navegador se frena aquí
+            const end = performance.now();
+            
+            // Si la pausa duró más de 100ms significa que el inspector está abierto
+            if (end - start > 100) {
+                document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;background:#111;color:#ff4444;font-family:sans-serif;font-size:24px;font-weight:bold;'>Acceso denegado: Las herramientas de desarrollo están deshabilitadas.</div>";
+            }
+        }
+        setInterval(blockDevTools, 500);
+    })();
+</script>
 </body>
 </html>
